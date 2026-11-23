@@ -1,0 +1,12 @@
+{
+  "name": "library-skill",
+  "owner": { "name": "jwcarman" },
+  "description": "A skill for writing and measuring a library's agent skill.",
+  "plugins": [
+    {
+      "name": "library-skill",
+      "source": "./",
+      "description": "Writes and measures the agent skill a library ships for its users."
+    }
+  ]
+}
