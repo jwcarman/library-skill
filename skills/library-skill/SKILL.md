@@ -23,7 +23,7 @@ roux's skill, Haiku on a new app, 30 runs each, rules written before each run:
 Wording for agents cut cost 70% but not failures. Failures came from what agents could not check
 (their sandbox had no Docker) and what they copied from the skill's own examples. The jump to 28 came
 from complete, CI-built examples, tests in the recipe that reach every branch, and a check script.
-Details and file paths: `references/roux-example.md` (~1,200 tokens).
+Details and file paths: `references/roux-example.md` (~900 tokens).
 
 ## The process
 
@@ -32,19 +32,19 @@ Do the steps in order; each has a reference. Read it before the step.
 1. **Find the failures first.** Build a small public fixture app that uses the library the way a
    user would, write 2–3 tasks with hidden acceptance tests, and run them with no skill (5–10 runs
    each, a cheap model). Classify every failure by cause. The skill exists to fix these; without
-   them you will write what the agent already knows. `references/baseline.md` (~1,300 tokens)
+   them you will write what the agent already knows. `references/baseline.md` (~1,200 tokens)
 2. **Write a recipe and cards.** One end-to-end recipe for the commonest job, with complete files
    (package, imports, tests), then one card per topic: rules with their reasons, exact names,
    steps, one example, a check, pitfalls. Agents copy examples literally, so every example must be
    correct, and every failure from step 1 must have its fix in the text an agent copies.
-   `references/writing.md` (~1,400 tokens)
+   `references/writing.md` (~1,000 tokens)
 3. **Give agents checks, and check the skill.** Ship a script agents run before they finish (it
    finds the project's tools and runs what exists, in the order the build needs). Build the
    recipe's code into the fixture in CI, and check every public name appears in the skill.
-   `references/checks.md` (~1,300 tokens)
+   `references/checks.md` (~1,100 tokens)
 4. **Measure, with the rules written first.** No skill against the skill (or old against new), ~30
    runs per arm, interleaved, scored by hidden tests plus the fixture's build. Commit the decision
-   rule before any run; report every run. `references/measuring.md` (~1,300 tokens)
+   rule before any run; report every run. `references/measuring.md` (~800 tokens)
 
 Then repeat 1–4 on what still fails. Stop when the measurement says the skill helps, or says the
 change did not.
