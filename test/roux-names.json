@@ -1,0 +1,30 @@
+{
+  "root": "../../roux",
+  "java": [
+    "runtime/*/src/main/java"
+  ],
+  "ts": [
+    "web/roux-web/src/*/index.ts"
+  ],
+  "exclude": [
+    "ProblemsRuntimeHints",
+    "ValidationRuntimeHints",
+    "RouxProblemsAutoConfiguration",
+    "RouxAuditingAutoConfiguration",
+    "RouxSpaAutoConfiguration",
+    "RouxThemeAutoConfiguration",
+    "RouxThemePersistenceAutoConfiguration",
+    "RouxEmailAutoConfiguration",
+    "RouxRolesAutoConfiguration",
+    "RouxMoneyAutoConfiguration",
+    "RouxOrganizationAutoConfiguration",
+    "RouxActivityLogAutoConfiguration",
+    "RouxActivityLogPersistenceAutoConfiguration",
+    "RouxUsersAutoConfiguration",
+    "RouxUsersPersistenceAutoConfiguration"
+  ],
+  "docs": [
+    "docs/guides",
+    "plugins/roux/skills/roux/references"
+  ]
+}

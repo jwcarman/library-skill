@@ -1,0 +1,11 @@
+{
+  "root": "../../jpa-utils",
+  "java": [
+    "src/main/java"
+  ],
+  "ts": [],
+  "exclude": [],
+  "docs": [
+    "no-such-skill"
+  ]
+}
