@@ -1,8 +1,17 @@
 {
   "name": "library-skill",
-  "version": "0.1.0",
   "description": "Writes and measures the agent skill a library ships for its users: find agents' failures first, write a recipe and cards, give agents a check script, build the examples in CI, and prove the skill with a pre-registered eval.",
-  "author": { "name": "jwcarman" },
+  "author": {
+    "name": "jwcarman"
+  },
   "license": "Apache-2.0",
-  "keywords": ["skills", "agents", "evals", "libraries", "open-source"]
+  "keywords": [
+    "skills",
+    "agents",
+    "evals",
+    "libraries",
+    "open-source"
+  ],
+  "homepage": "https://github.com/jwcarman/library-skill",
+  "repository": "https://github.com/jwcarman/library-skill"
 }

@@ -109,7 +109,7 @@ success, and James likes how it was to use.
 ## Constraints
 
 - No star imports, no warning suppression, in anything it writes or ships.
-- Only public repositories are changed (roux, jpa-utils); no private ones (noir-*).
+- Only public repositories are changed (roux, jpa-utils).
 - Token budget: Haiku for eval runs; state the cost of a measurement before running it.
 - Commits only on request; jpa-utils changes go through its own CI and release process.
 
