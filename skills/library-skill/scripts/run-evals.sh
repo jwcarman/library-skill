@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Runs a measurement: eval cases under `claude plugin eval`, two arms, then scores every run by
-# script into files score.py reads. Two ways to have two arms:
+# script into files score.py reads. One arm (a baseline, or any single version of the skill):
+#   --ablation none                       the plugin as it is, B batches of N runs
+# Two ways to have two arms:
 #   one plugin, --ablation with-without   the eval runs each case with and without the plugin
 #   --a <plugin dir> --b <plugin dir>     two versions of the skill (e.g. --a a git worktree at the
 #                                         old commit), alternated in batches: A, B, A, B, ...
@@ -11,8 +13,9 @@
 #   <batch>/<case>-<arm>-<n>.trace.jsonl  the run's transcript
 #
 # Usage: run-evals.sh --a <plugin dir> [--b <plugin dir>] --fixture <dir> [--batches B] [--runs N]
-#                     [--model M] [--dry-run] <out dir> <case>...
+#                     [--model M] [--ablation none] [--dry-run] <out dir> <case>...
 #   Without --b: one batch per case, both arms (with and without --a's plugin), N runs each.
+#   With --ablation none: B batches of N runs into <out>/b1, <out>/b2, ... (score.py <out> 'b*').
 #   With --b: B batches per arm of N runs each, alternating, into <out>/a-b1, <out>/b-b1, ...
 set -uo pipefail
 
@@ -24,7 +27,7 @@ BUILD="${BUILD:-evals/scripts/build.sh}"
 # ADAPT: paths left out of each run's diff (generated files that only add noise).
 diff_exclude=(':!**/package-lock.json')
 
-a="" b="" fixture="" batches=1 runs=5 model=haiku dry=false
+a="" b="" fixture="" batches=1 runs=5 model=haiku dry=false single=false
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --a) a="$2"; shift 2 ;;
@@ -34,11 +37,14 @@ while [ "$#" -gt 0 ]; do
     --runs) runs="$2"; shift 2 ;;
     --model) model="$2"; shift 2 ;;
     --dry-run) dry=true; shift ;;
+    --ablation)
+      [ "${2:-}" = none ] || { echo "run-evals: --ablation takes only none (one arm)" >&2; exit 2; }
+      single=true; shift 2 ;;
     *) break ;;
   esac
 done
-if [ -z "$a" ] || [ -z "$fixture" ] || [ "$#" -lt 2 ]; then
-  echo "usage: $(basename "$0") --a <plugin dir> [--b <plugin dir>] --fixture <dir> [--batches B] [--runs N] [--model M] [--dry-run] <out dir> <case>..." >&2
+if [ -z "$a" ] || [ -z "$fixture" ] || [ "$#" -lt 2 ] || { $single && [ -n "$b" ]; }; then
+  echo "usage: $(basename "$0") --a <plugin dir> [--b <plugin dir> | --ablation none] --fixture <dir> [--batches B] [--runs N] [--model M] [--dry-run] <out dir> <case>..." >&2
   exit 2
 fi
 out="$1"; shift
@@ -74,13 +80,19 @@ for c in json.load(open(sys.argv[1]))["cases"]:
     git -C "$work" reset -q
     [ -d "$plugin/evals/$case/acceptance" ] && "$ACCEPT" "$plugin/evals/$case" "$work" >"$tag.accept.txt" 2>&1
     "$BUILD" "$work" >"$tag.check.txt" 2>&1
-    echo "  $(basename "$tag"): accept $(grep -c '^PASS' "$tag.accept.txt" 2>/dev/null || echo 0)/$(grep -cE '^(PASS|FAIL)' "$tag.accept.txt" 2>/dev/null || echo 0), $(grep -m1 -E '^(PASS|FAIL) build' "$tag.check.txt")"
+    local passed total
+    passed="$(grep -c '^PASS' "$tag.accept.txt" 2>/dev/null)"; total="$(grep -cE '^(PASS|FAIL)' "$tag.accept.txt" 2>/dev/null)"
+    echo "  $(basename "$tag"): accept ${passed:-0}/${total:-0}, $(grep -m1 -E '^(PASS|FAIL) build' "$tag.check.txt")"
     rm -rf "$(dirname "$work")"
     chmod -R u+w "$kept" 2>/dev/null; rm -rf "$kept"
   done
 }
 
-if [ -z "$b" ]; then
+if $single; then
+  for i in $(seq 1 "$batches"); do
+    for case in "$@"; do evaluate "$a" none "$out/b$i" "$case"; done
+  done
+elif [ -z "$b" ]; then
   for case in "$@"; do evaluate "$a" with-without "$out/b1" "$case"; done
 else
   for i in $(seq 1 "$batches"); do
@@ -90,4 +102,4 @@ else
     done
   done
 fi
-$dry || echo "done $(date +%T); score: score.py $out 'a-b*' 'b-b*' (or 'b1:without' 'b1:with')"
+$dry || echo "done $(date +%T); score: score.py $out 'a-b*' 'b-b*' (or 'b1:without' 'b1:with'; one arm: 'b*')"

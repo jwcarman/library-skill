@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# run-evals.sh without running anything (--dry-run): two plugins alternate A, B, A, B; bad usage exits
+# run-evals.sh without running anything (--dry-run): two plugins alternate A, B, A, B; one arm runs
+# B batches with --ablation none; bad usage exits
 # 2. Live runs cost money; their scoring is first exercised by a library's real measurement.
 set -uo pipefail
 script="$(cd "$(dirname "$0")" && pwd)/../skills/library-skill/scripts/run-evals.sh"
@@ -10,6 +11,10 @@ out="$(bash "$script" --a /old --b /new --fixture "$fixture" --batches 2 --dry-r
 expect "alternates a-b1 b-b1 a-b2 b-b2" '[ "$(awk "{print \$2}" <<<"$out" | tr "\n" " ")" = "a-b1 b-b1 a-b2 b-b2 " ]'
 out="$(bash "$script" --a /one --fixture "$fixture" --dry-run /tmp/out case1 2>&1)"
 expect "one plugin: with and without in one batch" 'grep -q "eval b1 case1 plugin=/one ablation=with-without" <<<"$out"'
+out="$(bash "$script" --a /one --ablation none --fixture "$fixture" --batches 2 --dry-run /tmp/out case1 2>&1)"
+expect "one arm: --ablation none, batches b1 b2" 'grep -q "^eval b1 case1 plugin=/one ablation=none" <<<"$out" && grep -q "^eval b2 case1 plugin=/one ablation=none" <<<"$out" && [ "$(wc -l <<<"$out")" -eq 2 ]'
+bash "$script" --a /one --b /two --ablation none --fixture "$fixture" /tmp/out case1 >/dev/null 2>&1; code=$?
+expect "--ablation none with --b: usage, exit 2" '[ "$code" -eq 2 ]'
 bash "$script" --a /x /tmp/out case1 >/dev/null 2>&1; code=$?
 expect "no fixture: usage, exit 2" '[ "$code" -eq 2 ]'
 rm -rf "$fixture"

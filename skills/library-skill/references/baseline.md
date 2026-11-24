@@ -59,7 +59,7 @@ or another location's) is a `400` whose problem details name the field `name`."
    with the home directory unreadable and a proxy that refuses every request).
 2. Write the cases and their hidden tests. Run the hidden tests against a correct solution you wrote,
    so a failure later means the run, not the test.
-3. Run each case with **no skill**, 5–10 runs, a cheap model (Haiku): `scripts/run-evals.sh`.
+3. Run each case with **no skill**, 5–10 runs, a cheap model (Haiku): `scripts/run-evals.sh --ablation none`, scored with `score.py <out> 'b*'`.
 4. Classify every failed run by its first cause: read the build log and the diff, not the agent's
    summary. Keep a table: cause, count, example run.
 5. For each cause, decide where it is fixed: the recipe's example (most), a rule with its reason, a

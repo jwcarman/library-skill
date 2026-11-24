@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Scores two arms of a measurement and compares their successes with Fisher's exact test.
+"""Scores one arm of a measurement (a baseline), or two and compares their successes with Fisher's exact test.
 
-Usage: score.py <results dir> <arm A> <arm B> [--hidden N] [-v]
+Usage: score.py <results dir> <arm A> [<arm B>] [--hidden N] [-v]
 
 An arm is a glob of batch folders under the results dir (as run-evals.sh writes them), optionally
 with the eval arm to read after a colon: 'old-b*', 'b*:without' (default arm: with). Each batch holds
@@ -63,18 +63,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results")
     parser.add_argument("a")
-    parser.add_argument("b")
+    parser.add_argument("b", nargs="?", help="leave out to score one arm, as for a baseline")
     parser.add_argument("--hidden", type=int, help="how many hidden tests a case has (all must pass)")
     parser.add_argument("-v", action="store_true", help="one line per run")
     args = parser.parse_args()
 
-    arms = {"A": (args.a, runs(args.results, args.a, args.hidden)), "B": (args.b, runs(args.results, args.b, args.hidden))}
+    arms = {"A": (args.a, runs(args.results, args.a, args.hidden))}
+    if args.b:
+        arms["B"] = (args.b, runs(args.results, args.b, args.hidden))
     for label, (spec, rs) in arms.items():
         print(f"{label} {spec}: n={len(rs)} success={sum(r['success'] for r in rs)} "
               f"hidden={sum(r['hidden'] for r in rs)} build={sum(r['build'] for r in rs)} "
               f"errors={sum(r['error'] is not None for r in rs)} cost=${mean([r['cost'] for r in rs]):.3f} "
               f"turns={mean([r['turns'] for r in rs]):.1f} time={mean([r['time'] for r in rs]):.0f}s")
-    a, b = arms["A"][1], arms["B"][1]
+    a, b = arms["A"][1], arms.get("B", (None, []))[1]
     a_s, b_s = sum(r["success"] for r in a), sum(r["success"] for r in b)
     if a and b:
         print(f"p(B better than A) = {fisher_greater(b_s, len(b), a_s, len(a)):.4f}")

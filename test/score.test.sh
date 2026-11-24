@@ -22,4 +22,7 @@ rm "$copy"/round2-b1/app-locations-with-2.accept.txt "$copy"/round2-b1/app-locat
 out="$(python3 -I "$score" "$copy" 'round2-b1' 'round2-b1' --hidden 10 2>&1)"
 expect "missing result files: still 5 runs, 4 successes" 'grep -q "^A round2-b1: n=5 success=4 " <<<"$out"'
 
+out="$(python3 -I "$score" "$ROUX_RESULTS" 'round2-b*' --hidden 10 2>&1)"
+expect "one arm (a baseline): A only, no p" 'grep -q "^A round2-b\*: n=30 success=28 " <<<"$out" && ! grep -q "^B \|^p(" <<<"$out"'
+
 exit "$failed"

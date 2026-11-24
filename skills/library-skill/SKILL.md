@@ -60,7 +60,7 @@ Copy them into the library (a `skill-tools/` or `scripts/` folder) and adapt eve
 | `scripts/check.sh` | the agents' gate: finds the build, formatter, generated files and frontend, runs what exists, lists what it skipped |
 | `scripts/check-recipe.sh` | writes the recipe's marked blocks into a copy of the fixture and runs its build |
 | `scripts/check-recipe-fragments.example.py` | how fragments (pieces of existing files) are put in place; roux's, to adapt |
-| `scripts/run-evals.sh` | alternates two arms in batches around `claude plugin eval` and scores each run |
+| `scripts/run-evals.sh` | runs one arm (a baseline) or alternates two in batches around `claude plugin eval`, and scores each run |
 | `scripts/score.py` | successes, cost, turns, time per arm, and one-sided Fisher's exact p |
 | `scripts/PROTOCOL-template.md` | the measurement's rules, to fill in and commit before running |
 
