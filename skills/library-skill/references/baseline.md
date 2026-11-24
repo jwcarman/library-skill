@@ -78,3 +78,12 @@ or another location's) is a `400` whose problem details name the field `name`."
   common job before concluding the library needs no skill.
 - A contract left unpinned: runs fail on a path or field name and look like library failures.
 - Classifying by the agent's own explanation: it is often wrong about why its build failed.
+- A contract that asks for something the library does not do (jpa-utils: whole-phrase search, where
+  the library matches each word). Agents read the sources, see the difference, and write their own:
+  the case then measures the prompt, not the library. Pin the library's behavior, and read a batch's
+  diffs for "written by hand rather than with ..." before trusting its successes.
+- An example value in the prompt is a contract too: `"2026-11-23T14:05:00Z"` taught one run to cut
+  timestamps to whole seconds, which a hidden test then failed. Give examples in the form the tests
+  accept.
+- When nothing fails (jpa-utils: 19 of 20 on Haiku), the skill's measure is cost: count the tool
+  calls spent reading the library's jar or sources per run; that is what a skill can save.
